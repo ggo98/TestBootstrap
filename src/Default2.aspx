@@ -1,131 +1,84 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Default2.aspx.cs" Inherits="TestBootstrap.Default2" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="TestBootstrap.Default" %>
+
+<!DOCTYPE html>
 
 <!DOCTYPE html>
 <html lang="en">
-<head runat="server">
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Product List</title>
-
-    //<link href="https://pro.fontawesome.com/releases/v5.10.0/css/fontawesome.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bootstrap Grid Demo</title>
     <!-- Bootstrap 5 CSS (CDN) -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-
-    <!-- bootstrap-treeview -->
-    <link href="Content/bootstrap-treeview.min.css" rel="stylesheet" />
-    <script src="Scripts/jquery-2.1.4.js"></script>
-    <script src="Scripts/bootstrap-treeview.js"></script>
-
-    <script>
-        $(document).ready(function () {
-            //alert("");
-            // Define the tree data
-            var treeData = [
-                {
-                    text: "Parent 1",
-                    nodes: [
-                        {
-                            text: "Child 1",
-                            nodes: [
-                                { text: "Grandchild 1" },
-                                { text: "Grandchild 2" }
-                            ]
-                        },
-                        { text: "Child 2" }
-                    ]
-                },
-                {
-                    text: "Parent 2"
-                },
-                {
-                    text: "Parent 3"
-                }
-            ];
-
-            // Initialize the treeview
-            $('#tree').treeview({
-                data: treeData,
-                levels: 2,          // Expand up to 2 levels by default
-                color: "#428bca",   // Optional: text color
-                expandIcon: 'glyphicon glyphicon-chevron-right',
-                    collapseIcon: 'glyphicon glyphicon-chevron-down'
-            //    expandIcon: 'glyphicon glyphicon-plus',
-            //    collapseIcon: 'glyphicon glyphicon-minus'
-            });
-        });
-    </script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Just for visual clarity - so you can see the grid boxes */
+        .demo-box {
+            background-color: #e9ecef;
+            border: 1px solid #ced4da;
+            padding: 15px;
+            text-align: center;
+            border-radius: 4px;
+        }
+        .demo-box.highlight {
+            background-color: #0d6efd;
+            color: white;
+            border-color: #0d6efd;
+        }
+    </style>
 </head>
 <body>
-    <form id="form1" runat="server">
-        <div class="container mt-4">
-            <h2 class="mb-3">Product Inventory (HTML Table)</h2>
 
-            <!-- 
-                THE BOOTSTRAP HTML TABLE 
-                The <asp:Repeater> will generate the <tr> rows for us.
-            -->
-            <div class="table-responsive">
-                <table class="table table-striped table-hover table-bordered">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>ID</th>
-                            <th>Product Name</th>
-                            <th>Category</th>
-                            <th class="text-end">Price</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- The Repeater control binds to our C# data -->
-                        <asp:Repeater ID="rptProducts" runat="server">
-                            <ItemTemplate>
-                                <tr>
-                                    <td><%# Eval("ID") %></td>
-                                    <td><%# Eval("Name") %></td>
-                                    <td>
-                                        <span class="badge bg-secondary"><%# Eval("Category") %></span>
-                                    </td>
-                                    <td class="text-end fw-bold"><%# Eval("Price", "{0:C}") %></td>
-                                </tr>
-                            </ItemTemplate>
-<%--                            <!-- Optional: Show a message if the data source is empty -->
-                            <EmptyDataTemplate>
-                                <tr>
-                                    <td colspan="4" class="text-center text-muted">No products found.</td>
-                                </tr>
-                            </EmptyDataTemplate>--%>
-                        </asp:Repeater>
-                    </tbody>
-                </table>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Bootstrap Grid Example</h1>
+
+        <!-- ROW 1: Three Equal Columns -->
+        <h5>1. 3 Equal Columns (stack on mobile)</h5>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="demo-box">Column 1 (col-md-4)</div>
+            </div>
+            <div class="col-md-4">
+                <div class="demo-box">Column 2 (col-md-4)</div>
+            </div>
+            <div class="col-md-4">
+                <div class="demo-box">Column 3 (col-md-4)</div>
             </div>
         </div>
-        <hr />
-        <div class="container mt-4">
-            <h2 class="mb-3">Product Inventory (GridView)</h2>
 
-            <!-- 
-                THE BOOTSTRAP HTML TABLE 
-                The <asp:Repeater> will generate the <tr> rows for us.
-            -->
-            <div class="gridview-responsive">
-                <asp:GridView ID="gvProducts" runat="server" 
-                AutoGenerateColumns="true" 
-                CssClass="table table-striped table-hover table-bordered"
-                GridLines="None" 
-                BorderStyle="None" />
+        <hr class="my-4">
+
+        <!-- ROW 2: Unequal Columns (Sidebar layout) -->
+        <h5>2. Unequal Columns (8/4 split)</h5>
+        <div class="row">
+            <div class="col-md-8">
+                <div class="demo-box highlight">Main Content (col-md-8)</div>
+            </div>
+            <div class="col-md-4">
+                <div class="demo-box">Sidebar (col-md-4)</div>
             </div>
         </div>
-        <hr />
-        <div class="container mt-4">
-            <h2>Simple Treeview</h2>
-            <!-- The container where the tree will render -->
-            <div id="tree"></div>
-        </div>
-    </form>
 
-    <!-- Bootstrap 5 JavaScript Bundle -->
+        <hr class="my-4">
+
+        <!-- ROW 3: Automatic equal widths -->
+        <h5>3. Auto-Layout (Equal width, no numbers needed)</h5>
+        <div class="row">
+            <div class="col">
+                <div class="demo-box">Auto Col 1</div>
+            </div>
+            <div class="col">
+                <div class="demo-box">Auto Col 2</div>
+            </div>
+            <div class="col">
+                <div class="demo-box">Auto Col 3</div>
+            </div>
+            <div class="col">
+                <div class="demo-box">Auto Col 4</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JavaScript Bundle (optional, but needed for menus/modals) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
