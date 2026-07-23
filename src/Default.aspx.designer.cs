@@ -11,7 +11,7 @@ namespace TestBootstrap
 {
 
 
-    public partial class Default2
+    public partial class Default
     {
 
         /// <summary>
