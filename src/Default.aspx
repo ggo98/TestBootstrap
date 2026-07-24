@@ -7,8 +7,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Product List</title>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+<%--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />--%>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.css" />
 
+    <style>
+        .custom-expand-icon::before {
+        content: "\2717";   /* ▉ - Unicode escape, CSS syntax */
+        font-family: inherit; /* or a specific font if the glyph needs one */
+    </style>
+}
     <!-- Bootstrap 5 CSS (CDN) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
 
@@ -45,8 +52,8 @@
                     console.error("Failed to load tree data:", err);
                 }
             });
-
             return;
+
             // static tree data
             var treeData = [
                 {
@@ -95,14 +102,15 @@
                         data: response.d,
                         levels: 1,
                         color: "#428bca",
+                        showImage: true,
+                        //
                         //expandIcon: 'fa-angle-right',
-
-                        // "ggod" combination
+                        // "good" combination / can't commented even if we use custom icons, because no item will be expandable
                         collapseIcon: 'fa fa-angle-down',
                         expandIcon: 'fas fa-chevron-right',
-
-
+                        //
                         //collapseIcon: 'fas fa-chevron-down',
+                        emptyIcon: 'custom-expand-icon',
                         lazyLoad: function (node, render) {
                             $.ajax({
                                 type: "POST",
