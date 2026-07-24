@@ -72,8 +72,7 @@ namespace TestBootstrap
                     text = item.Text,
                     lazyLoad = item.HasChildren,
                     nodes = item.HasChildren ? new List<TreeNode>() : null,
-                    //image = item.HasChildren ? "/images/folder48x48.png" : null
-                    image = item.HasChildren ? "/images/folder48x48.png" : "/images/file.png"
+                    image = item.HasChildren ? "/images/folder.png" : "/images/file.png"
                 });
             }
 
@@ -99,9 +98,7 @@ namespace TestBootstrap
                     text = item.Text,
                     lazyLoad = item.HasChildren,
                     nodes = item.HasChildren ? new List<TreeNode>() : null,
-                    //image = item.HasChildren ? "/images/folder48x48.png" : null
-                    image = item.HasChildren ? "/images/folder48x48.png" : "/images/file.png"
-                    //image = "/images/folder48x48.png"
+                    image = item.HasChildren ? "/images/folder.png" : "/images/file.png"
                 });
             }
 
@@ -147,7 +144,6 @@ namespace TestBootstrap
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             Text = reader.GetString(reader.GetOrdinal("Text")),
                             HasChildren = reader.GetInt32(reader.GetOrdinal("HasChildren")) == 1,
-                            //image = "/images/folder48x48.png"
                         });
                     }
                 }
@@ -183,7 +179,6 @@ namespace TestBootstrap
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             Text = reader.GetString(reader.GetOrdinal("Text")),
                             HasChildren = reader.GetInt32(reader.GetOrdinal("HasChildren")) == 1,
-                            //image = "/images/folder48x48.png"
                         });
                     }
                 }

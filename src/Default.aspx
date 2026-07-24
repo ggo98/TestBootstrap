@@ -17,12 +17,12 @@
     </style>
 
     <script src="Scripts/jquery-3.7.1.js"></script>
-}
+
     <!-- Bootstrap 5 CSS (CDN) -->
 <%--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />--%>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.css" rel="stylesheet" />
 
-    <!-- bootstrap-treeview -->
+    <!-- bootstrap-treeview (from https://github.com/patternfly/patternfly-bootstrap-treeview)-->
     <link href="css/bootstrap-treeview.css" rel="stylesheet" />
     <script src="js/bootstrap-treeview.js"></script>
 
@@ -135,51 +135,6 @@
                 }
             });
         }
-        function xxxloadRootTree() {
-            $.ajax({
-                type: "POST",
-                url: "Default.aspx/GetRootNodes",
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function (response) {
-                    $('#tree').treeview({
-                        data: response.d,
-                        levels: 1,
-                        color: "#428bca",
-                        expandIcon: 'fas fa-chevron-right',
-                        collapseIcon: 'fas fa-chevron-down',
-                        onNodeExpanded: function (event, node) {
-                            // Only fetch if this node still has the placeholder child
-                            if (node.nodes && node.nodes.length === 1 && node.nodes[0].id === -1) {
-                                $.ajax({
-                                    type: "POST",
-                                    url: "Default.aspx/GetChildNodes",
-                                    contentType: "application/json; charset=utf-8",
-                                    dataType: "json",
-                                    data: JSON.stringify({ parentId: node.id }),
-                                    success: function (childResponse) {
-                                        var tree = $('#tree');
-                                        // Remove the placeholder
-                                        tree.treeview('removeNode', [node.nodes[0], { silent: true }]);
-                                        // Add the real children
-                                        $.each(childResponse.d, function (i, child) {
-                                            tree.treeview('addNode', [child, node, false, { silent: true }]);
-                                        });
-                                    },
-                                    error: function (xhr) {
-                                        console.error("Failed to load children:", xhr.responseText);
-                                    }
-                                });
-                            }
-                        }
-                    }); // <-- this was the missing closing for .treeview(
-                },
-                error: function (xhr) {
-                    console.error("Failed to load root nodes:", xhr.responseText);
-                }
-            });
-        }
-
     </script>
 </head>
 <body>
