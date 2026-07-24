@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
@@ -135,8 +136,50 @@ ID	ParentID	Name
         }
 
         [WebMethod]
-        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+
         public static List<TreeNode> GetRootNodes()
+        {
+            var roots = new List<TreeNode>();
+            var rootData = GetRootDataFromDb();
+
+            foreach (var item in rootData)
+            {
+                roots.Add(new TreeNode
+                {
+                    id = item.Id,
+                    text = item.Text,
+                    lazyLoad = item.HasChildren,
+                    nodes = item.HasChildren ? new List<TreeNode>() : null
+                });
+            }
+
+            return roots;
+        }
+
+        [WebMethod]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public static List<TreeNode> GetChildNodes(int parentId)
+        {
+            var children = new List<TreeNode>();
+            var childData = GetChildDataFromDb(parentId);
+
+            foreach (var item in childData)
+            {
+                children.Add(new TreeNode
+                {
+                    id = item.Id,
+                    text = item.Text,
+                    lazyLoad = item.HasChildren,
+                    nodes = item.HasChildren ? new List<TreeNode>() : null
+                });
+            }
+
+            return children;
+        }
+        
+        [WebMethod]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public static List<TreeNode> xxxxGetRootNodes()
         {
             var rows = GetCategoryRowsByParent(null);
             var ret = BuildLevel(rows, null);
@@ -148,15 +191,110 @@ ID	ParentID	Name
         /// </summary>
         /// <param name="parentId"></param>
         /// <returns></returns>
-        [WebMethod]
-        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-        public static List<TreeNode> GetChildNodes(int parentId)
+        //[WebMethod]
+        //[ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        //public static List<TreeNode> GetChildNodes(int parentId)
+        //{
+        //    var children = new List<TreeNode>();
+
+        //    // Replace with your actual query, filtered by parentId
+        //    var childData = GetChildDataFromDb(parentId); // e.g. returns id, text, hasChildren
+
+        //    foreach (var item in childData)
+        //    {
+        //        children.Add(new TreeNode
+        //        {
+        //            id = item.Id,
+        //            text = item.Text,
+        //            lazyLoad = item.HasChildren,
+        //            nodes = null
+        //        });
+        //    }
+
+        //    return children;
+        //}
+
+        public class NodeData
         {
-            var allRows = GetCategoryRowsByParent(parentId);
-            var ret = BuildLevel(allRows, parentId);
-            return ret;
+            public int Id { get; set; }
+            public string Text { get; set; }
+            public bool HasChildren { get; set; }
         }
 
+        private static string GetConnectionString()
+        {
+            //return ConfigurationManager.ConnectionStrings["YourConnectionStringName"].ConnectionString;
+            return "server=.; initial catalog=DataSetReport; User ID=sa; Password=M-anager98;";
+        }
+
+        public static List<NodeData> GetRootDataFromDb()
+        {
+            var result = new List<NodeData>();
+
+            const string sql = @"
+        SELECT 
+            n.Id,
+            n.Name AS Text,
+            CASE WHEN EXISTS (SELECT 1 FROM Categories c WHERE c.ParentId = n.Id) 
+                 THEN 1 ELSE 0 END AS HasChildren
+        FROM Categories n
+        WHERE n.ParentId IS NULL";
+
+            using (var conn = new SqlConnection(GetConnectionString()))
+            using (var cmd = new SqlCommand(sql, conn))
+            {
+                conn.Open();
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        result.Add(new NodeData
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Text = reader.GetString(reader.GetOrdinal("Text")),
+                            HasChildren = reader.GetInt32(reader.GetOrdinal("HasChildren")) == 1
+                        });
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        public static List<NodeData> GetChildDataFromDb(int parentId)
+        {
+            var result = new List<NodeData>();
+
+            const string sql = @"
+        SELECT 
+            n.Id,
+            n.Name AS Text,
+            CASE WHEN EXISTS (SELECT 1 FROM Categories c WHERE c.ParentId = n.Id) 
+                 THEN 1 ELSE 0 END AS HasChildren
+        FROM Categories n
+        WHERE n.ParentId = @ParentId";
+
+            using (var conn = new SqlConnection(GetConnectionString()))
+            using (var cmd = new SqlCommand(sql, conn))
+            {
+                cmd.Parameters.AddWithValue("@ParentId", parentId);
+                conn.Open();
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        result.Add(new NodeData
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Text = reader.GetString(reader.GetOrdinal("Text")),
+                            HasChildren = reader.GetInt32(reader.GetOrdinal("HasChildren")) == 1
+                        });
+                    }
+                }
+            }
+
+            return result;
+        }
         private static List<CategoryRow> GetCategoryRows()
         {
             try
@@ -225,13 +363,10 @@ ID	ParentID	Name
 
         public class TreeNode
         {
+            public int id { get; set; }
             public string text { get; set; }
+            public bool lazyLoad { get; set; }
             public List<TreeNode> nodes { get; set; }
-            /// <summary>
-            /// 
-            /// </summary>
-            public int id { get; set; }          // needed so JS knows which node to expand
-            public bool lazyLoad { get; set; } = true;
         }
 
         // Example C# method that returns a DataTable with our data

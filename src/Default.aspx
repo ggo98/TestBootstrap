@@ -13,7 +13,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
 
     <!-- bootstrap-treeview -->
-    <link href="Content/bootstrap-treeview.min.css" rel="stylesheet" />
+    <link href="css/bootstrap-treeview.css" rel="stylesheet" />
     <script src="Scripts/jquery-2.1.4.js"></script>
     <script src="Scripts/bootstrap-treeview.js"></script>
 
@@ -95,8 +95,14 @@
                         data: response.d,
                         levels: 1,
                         color: "#428bca",
+                        //expandIcon: 'fa-angle-right',
+
+                        // "ggod" combination
+                        collapseIcon: 'fa fa-angle-down',
                         expandIcon: 'fas fa-chevron-right',
-                        collapseIcon: 'fas fa-chevron-down',
+
+
+                        //collapseIcon: 'fas fa-chevron-down',
                         lazyLoad: function (node, render) {
                             $.ajax({
                                 type: "POST",
