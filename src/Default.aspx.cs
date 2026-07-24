@@ -73,7 +73,7 @@ namespace TestBootstrap
                     lazyLoad = item.HasChildren,
                     nodes = item.HasChildren ? new List<TreeNode>() : null,
                     //image = item.HasChildren ? "/images/folder48x48.png" : null
-                    image = "/images/folder48x48.png"
+                    image = item.HasChildren ? "/images/folder48x48.png" : "/images/file.png"
                 });
             }
 
@@ -100,7 +100,8 @@ namespace TestBootstrap
                     lazyLoad = item.HasChildren,
                     nodes = item.HasChildren ? new List<TreeNode>() : null,
                     //image = item.HasChildren ? "/images/folder48x48.png" : null
-                    image = "/images/folder48x48.png"
+                    image = item.HasChildren ? "/images/folder48x48.png" : "/images/file.png"
+                    //image = "/images/folder48x48.png"
                 });
             }
 
