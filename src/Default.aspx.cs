@@ -100,14 +100,12 @@ ID	ParentID	Name
                 //System.Configuration.ConfigurationManager
                 //.ConnectionStrings["YourConnStringName"].ConnectionString;
 
-                string sql = $@"
-        SELECT c1.ID, c1.ParentID, c1.Name,
-               CASE WHEN EXISTS (
-                   SELECT 1 FROM Categories c2 WHERE c2.ParentID = c1.ID
-               ) THEN 1 ELSE 0 END AS HasChildren
-        FROM Categories c1
-        WHERE ({parentId} IS NULL AND c1.ParentID IS NULL)
-           OR (c1.ParentID = {parentId})";
+                string sql = $@"SELECT c1.ID, c1.ParentID, c1.Name,
+                CASE WHEN EXISTS (
+                    SELECT 1 FROM Categories c2 WHERE c2.ParentID = c1.ID
+                ) THEN 1 ELSE 0 END AS HasChildren
+                FROM Categories c1
+                WHERE ({(null == parentId ? "c1.ParentId IS NULL" : $"c1.ParentId = {parentId}")})";
                 using (var conn = new SqlConnection(connStr))
                 using (var cmd = new SqlCommand(sql, conn))
                 {
@@ -141,7 +139,8 @@ ID	ParentID	Name
         public static List<TreeNode> GetRootNodes()
         {
             var rows = GetCategoryRowsByParent(null);
-            return BuildLevel(rows, null);
+            var ret = BuildLevel(rows, null);
+            return ret;
         }
 
         /// <summary>
@@ -154,7 +153,8 @@ ID	ParentID	Name
         public static List<TreeNode> GetChildNodes(int parentId)
         {
             var allRows = GetCategoryRowsByParent(parentId);
-            return BuildLevel(allRows, parentId);
+            var ret = BuildLevel(allRows, parentId);
+            return ret;
         }
 
         private static List<CategoryRow> GetCategoryRows()
@@ -193,18 +193,23 @@ ID	ParentID	Name
 
         private static List<TreeNode> BuildLevel(List<CategoryRow> rows, int? parentId)
         {
-            return rows
+            var ret =rows
                 .Where(r => r.ParentID == parentId)
                 .Select(r => new TreeNode
                 {
                     id = r.ID,
                     text = r.Name,
+
+                    nodes = r.HasChildren ?
+                    new List<TreeNode> { new TreeNode { text = "Loading...", id = -1 } }
+                    : null,
                     /// <summary>
                     /// used only for the "load on expand" version
                     /// </summary>
-                    lazyLoad = r.HasChildren
+                    //lazyLoad = r.HasChildren
                 })
                 .ToList();
+            return ret;
         }
         private static List<TreeNode> BuildTree(List<CategoryRow> allRows, int? parentId)
         {
@@ -226,7 +231,7 @@ ID	ParentID	Name
             /// 
             /// </summary>
             public int id { get; set; }          // needed so JS knows which node to expand
-            public bool lazyLoad { get; set; }
+            public bool lazyLoad { get; set; } = true;
         }
 
         // Example C# method that returns a DataTable with our data
