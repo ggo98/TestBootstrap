@@ -1,0 +1,31 @@
+HTTP/1.1 200 OK..Cache-Control: private..Content-Type: applicati
+
+on/json; charset=utf-8..Server: Microsoft-IIS/10.0..Set-Cookie:
+ 
+ASP.NET_SessionId=z3oojyxp11ngkfjfwyzz4msm; path=/; HttpOnly;
+ Sa
+meSite=Lax..Set-Cookie: UID=goRyXEPm1rLxNu/KNbs2Jg==; expir
+es=Th
+u, 22-Oct-2026 12:05:54 GMT; path=/; HttpOnly..Set-Cookie
+: PWD=9
+n36tTd5htXWOH/Qx3en5w==; expires=Thu, 22-Oct-2026 12:05
+:54 GMT; 
+path=/; HttpOnly..X-AspNet-Version: 4.0.30319..Persis
+tent-Auth: 
+true..X-Powered-By: ASP.NET..WWW-Authenticate: Nego
+tiate oRswGaA
+DCgEAoxIEEAEAAABq1hXByAXZFAAAAAA=..Date: Fri, 24 
+Jul 2026 12:05:
+54 GMT..Content-Length: 168....[{"Table Path":"
+\"ΔαtαSεtRεp
+ort\"","Table Description":""},{"Table Path":
+"DataSetReport","Ta
+ble Description":""},{"Table Path":"netrepo
+rt","Table Descriptio
+n":""}]
+
+
+
+
+
+[{"Table Path":"\"ΔαtαSεtRεport\"","Table Description":""},{"Table Path":"DataSetReport","Table Description":""},{"Table Path":"netreport","Table Description":""}]
