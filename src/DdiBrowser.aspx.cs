@@ -67,7 +67,7 @@ namespace TestBootstrap
         /// <summary>
         /// 'load on expand' mode.
         /// *** Note about the 2 parameters:
-        /// in the .ASPX file, the sent parameter is a json string with 2 values (parentId and delimitedFlags).
+        /// in the .ASPX file, the parameter sent is a json string with 2 values (parentId and delimitedFlags).
         /// ASP.NET detects JSON, and extract the values. Since there are 2 values, 2 parameters have to be defined for GetChildrenNodes().
         /// </summary>
         /// <returns></returns>
