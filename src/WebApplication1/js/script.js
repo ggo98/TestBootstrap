@@ -1,14 +1,20 @@
-﻿async function resolve() {
+﻿const baseUrl = "https://localhost/dvweb/ddi";
+
+const map = new Map();
+
+async function resolve() {
 }
 
-async function apiCall(endpoint)
+async function ddiapi(endpoint)
 {
     try {
-        document.body.style.cursor = 'wait';
-        //document.getElementById("mainDiv").style.cursor = "wait";
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        //alert("pause");
+        //endpoint = baseUrl + encodeURIComponent(endpoint);
         endpoint = "ApiProxy.ashx?q=" + encodeURIComponent(endpoint);
+
+        document.body.style.cursor = 'wait'; // does not work
+        //document.getElementById("mainDiv").style.cursor = "wait";
+        //await new Promise(resolve => setTimeout(resolve, 1500));
+        //alert("pause");
         var response = await fetch(endpoint,
             {
                 method: 'GET',
@@ -42,6 +48,16 @@ async function handleClick() {
 
 const app = 
 {
+    async getAndStoreInfoInMap(alias) {
+        if (!map.has(alias)) {
+            var info = await ddiapi("/info/" + alias);
+            //alert(info.MinLevel);
+            //console.log(JSON.stringify(info));
+            map.set(alias, info);
+        }
+
+    },
+
     // /Secured SQL Server/DataSetReport/demo
     async tables(xendpoint)
     { 
@@ -51,26 +67,34 @@ const app =
         {
             var lst = document.getElementById('lst');
             console.log("endpoint = "+ endpoint)
-            var data = await apiCall(endpoint);
+            var data = await ddiapi(endpoint);
+
+            var info = await ddiapi("/info/" + "Secured SQL Server");
+            alert(info);
+            map.set(alias, info);
 
             lst.replaceChildren();
-            data.forEach(item => {
+            for (const item of data) {
+                //data.forEach(item => {
                 var li = document.createElement('li');
                 var path = item["Table Path"];
                 console.log("TABLE PATH: " + path);
-                var value = path.replaceAll(".", "/");
+                //var value = path.replaceAll(".", "/");
                 var tmp = xendpoint.replaceAll("/", ".");
                 const matches = tmp.match(/"[^"]*"|[^".]+/g) || [];
                 var alias = matches[0];
+                await this.getAndStoreInfoInMap(alias);
+
                 value = alias + "/" + path.replaceAll(".", "/");
                 console.log("value: " + value);
 
                 li.dataset.item = value;
                 console.log("tables, adding " + li.dataset.item);
-                path = path.replace(/^"|"$/g, '');
+                path = path.replaceAll('"', '');
                 li.textContent = path;
                 lst.appendChild(li);
-            });
+            }
+            //});
         }
         catch (e)
         {
@@ -86,7 +110,7 @@ const app =
     async aliases() {
         try {
             var lst = document.getElementById('lst');
-            var data = await apiCall("/aliases");
+            var data = await ddiapi("/aliases");
 
             lst.replaceChildren();
             data.forEach(item => {
