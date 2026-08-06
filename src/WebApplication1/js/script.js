@@ -1,42 +1,47 @@
-﻿const baseUrl = "https://localhost/dvweb/ddi";
+﻿const baseUrl = "http://localhost/dvweb_dbg/ddi";
 
 const map = new Map();
 
 async function resolve() {
 }
 
-async function ddiapi(endpoint)
-{
+async function ddiapi(endpoint) {
     try {
-        //endpoint = baseUrl + encodeURIComponent(endpoint);
-        endpoint = "ApiProxy.ashx?q=" + encodeURIComponent(endpoint);
+        // CORS version
+        endpoint = baseUrl + endpoint;
 
-        document.body.style.cursor = 'wait'; // does not work
+        // with ApiProxy version
+        //endpoint = "ApiProxy.ashx?q=" + encodeURIComponent(endpoint);
+
+        //document.body.style.cursor = 'wait'; // does not work
         //document.getElementById("mainDiv").style.cursor = "wait";
         //await new Promise(resolve => setTimeout(resolve, 1500));
         //alert("pause");
+        //alert(endpoint);
         var response = await fetch(endpoint,
+        {
+            method: 'GET',
+            headers:
             {
-                method: 'GET',
-                headers:
-                {
-                    'Accept': 'application/json'
-                },
-                credentials: 'include'
-            });
+                'Accept': 'application/json'
+            },
+            credentials: 'include'
+        });
 
         if (!response.ok) {
             throw new Error("HTTP " + response.status + ": " + response.statusText);
         }
 
-        return await response.json();
+        var ret = await response.json();
+        //alert(ret);
+        return ret;
     }
     catch (e) {
         console.error(e);
         throw new Error(e.message);
     }
     finally {
-        document.body.style.cursor = 'default';
+        //document.body.style.cursor = 'default';
         //document.getElementById("mainDiv").style.cursor = "default";
     }
 }
@@ -70,7 +75,7 @@ const app =
             var data = await ddiapi(endpoint);
 
             var info = await ddiapi("/info/" + "Secured SQL Server");
-            alert(info);
+            //alert(info);
             map.set(alias, info);
 
             lst.replaceChildren();
