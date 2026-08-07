@@ -4,6 +4,19 @@ const map = new Map();
 
 async function resolve() {
 }
+
+function cleanPath(s) {
+    console.log("CLEANPATH(" + s+  ")");
+    var ret = "/"
+        + s.split('/') // "/tables//a b c/" => ['', 'tables', '', 'a b c', ''] 
+            .filter(Boolean) // => ['tables', 'a b c']
+            .join('/'); // => "tables/a b c"
+    if ("/" == ret)
+        ret = "";
+    console.log("RET=" + ret);
+    return ret;
+}
+
 function myReplaceAll(s, pattern, replacement) {
     if (null == s)
         return "";
@@ -12,10 +25,12 @@ function myReplaceAll(s, pattern, replacement) {
 
 async function ddiapi(endpoint) {
     try {
-        // CORS version
+        endpoint = cleanPath(endpoint.trim());
+
+        // "pure javascript"" version
         endpoint = baseUrl + endpoint;
 
-        // with ApiProxy version
+        // "with ApiProxy"" version
         //endpoint = "ApiProxy.ashx?q=" + encodeURIComponent(endpoint);
 
         console.log("");
@@ -34,7 +49,7 @@ async function ddiapi(endpoint) {
             {
                 'Accept': 'application/json'
             },
-            credentials: 'include'
+            credentials: 'include' // required for the pure javascript version
         });
 
         if (!response.ok) {
@@ -76,6 +91,13 @@ const app =
     async tables(xendpoint)
     { 
         console.log("xendpoint: " + xendpoint);
+        if (null != xendpoint)
+            xendpoint = xendpoint.trim();
+
+        if (null == xendpoint
+            || "" == xendpoint)
+            return await this.aliases();
+
         endpoint = "/tables/" + xendpoint;
         try
         {
@@ -83,9 +105,9 @@ const app =
             console.log("endpoint = "+ endpoint)
             var data = await ddiapi(endpoint);
 
-            var info = await ddiapi("/info/" + "Secured SQL Server");
+            //var info = await ddiapi("/info/" + "Secured SQL Server");
             //alert(info);
-            map.set(alias, info);
+            //map.set(alias, info);
 
             lst.replaceChildren();
             for (const item of data) {
@@ -144,7 +166,11 @@ const app =
     },
 
     async navigateClick() {
-        var text = document.getElementById('path').value;
+        console.log("navigateClick");
+        var text = document.getElementById('path').value.trim();
+        text = cleanPath(text);
+        if ("/" == text)
+            text = "";
         text = myReplaceAll(text, ".", "/");
         console.log('text:', text);
         await this.tables(text);
