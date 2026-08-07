@@ -4,6 +4,11 @@ const map = new Map();
 
 async function resolve() {
 }
+function myReplaceAll(s, pattern, replacement) {
+    if (null == s)
+        return "";
+    return s.replaceAll(pattern, replacement);
+}
 
 async function ddiapi(endpoint) {
     try {
@@ -12,6 +17,10 @@ async function ddiapi(endpoint) {
 
         // with ApiProxy version
         //endpoint = "ApiProxy.ashx?q=" + encodeURIComponent(endpoint);
+
+        console.log("");
+        console.log("*** DDIAPI: " + endpoint);
+        console.log("");
 
         //document.body.style.cursor = 'wait'; // does not work
         //document.getElementById("mainDiv").style.cursor = "wait";
@@ -84,18 +93,17 @@ const app =
                 var li = document.createElement('li');
                 var path = item["Table Path"];
                 console.log("TABLE PATH: " + path);
-                //var value = path.replaceAll(".", "/");
-                var tmp = xendpoint.replaceAll("/", ".");
+                var tmp = myReplaceAll(xendpoint, "/", ".");
                 const matches = tmp.match(/"[^"]*"|[^".]+/g) || [];
                 var alias = matches[0];
                 await this.getAndStoreInfoInMap(alias);
 
-                value = alias + "/" + path.replaceAll(".", "/");
+                value = alias + "/" + myReplaceAll(path, ".", "/");
                 console.log("value: " + value);
 
                 li.dataset.item = value;
                 console.log("tables, adding " + li.dataset.item);
-                path = path.replaceAll('"', '');
+                path = myReplaceAll(path, '"', '');
                 li.textContent = path;
                 lst.appendChild(li);
             }
@@ -137,7 +145,7 @@ const app =
 
     async navigateClick() {
         var text = document.getElementById('path').value;
-        text = text.replaceAll(".", "/");
+        text = myReplaceAll(text, ".", "/");
         console.log('text:', text);
         await this.tables(text);
         console.log("-----------------------------------------------------------");
@@ -153,7 +161,7 @@ const app =
             var isAlias = item.isAlias;
             console.log("in listener1: value=" + value);
             var path = item.textContent.trim();
-            path = path.replaceAll(".", "/");
+            path = myReplaceAll(path, ".", "/");
             console.log('calling tables, path:', path);
             await this.tables(value);
             console.log("-----------------------------------------------------------");
