@@ -25,6 +25,8 @@ function myReplaceAll(s, pattern, replacement) {
 
 async function ddiapi(endpoint) {
     try {
+        var errorTxt = document.getElementById("errorTxt");
+        errorTxt.textContent = "";
         endpoint = cleanPath(endpoint.trim());
 
         // "pure javascript"" version
@@ -49,10 +51,19 @@ async function ddiapi(endpoint) {
             {
                 'Accept': 'application/json'
             },
-            credentials: 'include' // required for the pure javascript version
+            credentials: 'include' // required for the "pure javascript"" version
         });
 
         if (!response.ok) {
+            var json = await response.text();
+            //var json = JSON.stringify(await response.json(), null, 4);
+            if (null != json) {
+                //const position = [...json].findIndex(char => char === "\n");
+                //alert(position); // 4
+                document.getElementById("errorTxt").textContent = json.replaceAll("\r\n", "\n").replaceAll("<br/>");
+                //alert("JSON:" + json);
+                throw new Error(json);
+            }
             throw new Error("HTTP " + response.status + ": " + response.statusText);
         }
 
@@ -61,7 +72,7 @@ async function ddiapi(endpoint) {
         return ret;
     }
     catch (e) {
-        console.error(e);
+        console.error(e.message);
         throw new Error(e.message);
     }
     finally {
