@@ -23,7 +23,7 @@ namespace TestBootstrap
 {
     public partial class DdiBrowser : System.Web.UI.Page
     {
-        const string BaseUrl = "http://localhost/dvweb/ddi/";
+        const string BaseUrl = "http://localhost/dvweb_dbg/ddi/";
 
         protected void Page_Load(object sender, EventArgs e)
         {
