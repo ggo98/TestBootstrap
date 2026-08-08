@@ -1,4 +1,37 @@
-﻿import Color from './color.js';
+﻿import Color from './color.js'; // Direct import, no dynamic import needed
+
+
+//class Color {
+//    constructor(r, g, b, a = 1) {
+//        this.r = r;
+//        this.g = g;
+//        this.b = b;
+//        this.a = a;
+//    }
+
+//    static fromString(str) {
+//        alert('from string');
+//        // matches "rgb(r, g, b)" or "rgba(r, g, b, a)"
+//        var match = str.match(/rgba?\(([^)]+)\)/);
+//        if (!match)
+//            throw new Error(`Not a valid rgb/rgba string: ${str}`);
+
+//        var parts = match[1].split(',').map(s => parseFloat(s.trim()));
+//        var [r, g, b, a = 1] = parts;
+//        return new Color(r, g, b, a);
+//    }
+
+//    toString() {
+//        return this.a === 1
+//            ? `rgb(${this.r}, ${this.g}, ${this.b})`
+//            : `rgba(${this.r}, ${this.g}, ${this.b}, ${this.a})`;
+//    }
+
+//    invert() {
+//        return new Color(255 - this.r, 255 - this.g, 255 - this.b, this.a);
+//    }
+//}
+
 
 const baseUrl = "http://localhost/dvweb_dbg/ddi";
 
@@ -8,12 +41,14 @@ async function resolve() {
 }
 
 function cleanPath(s) {
+    console.log("CLEANPATH(" + s+  ")");
     var ret = "/"
         + s.split('/') // "/tables//a b c/" => ['', 'tables', '', 'a b c', ''] 
             .filter(Boolean) // => ['tables', 'a b c']
             .join('/'); // => "tables/a b c"
     if ("/" == ret)
         ret = "";
+    console.log("RET=" + ret);
     return ret;
 }
 
@@ -31,11 +66,9 @@ async function ddiapi(endpoint) {
 
         // "pure javascript"" version
         endpoint = baseUrl + endpoint;
-        console.log('using the "pure javascript" version of the code');
 
-        // "with ApiProxy" version
+        // "with ApiProxy"" version
         //endpoint = "ApiProxy.ashx?q=" + encodeURIComponent(endpoint);
-        //console.log('using the "with ApiProxy" version of the code");
 
         console.log("");
         console.log("*** DDIAPI: " + endpoint);
@@ -44,6 +77,8 @@ async function ddiapi(endpoint) {
         //document.body.style.cursor = 'wait'; // does not work
         //document.getElementById("mainDiv").style.cursor = "wait";
         //await new Promise(resolve => setTimeout(resolve, 1500));
+        //alert("pause");
+        //alert(endpoint);
         var response = await fetch(endpoint,
         {
             method: 'GET',
@@ -60,17 +95,20 @@ async function ddiapi(endpoint) {
             if (null != json) {
                 //const position = [...json].findIndex(char => char === "\n");
                 //alert(position); // 4
-                document.getElementById("errorTxt").textContent = json.replaceAll("\r\n", "\n").replaceAll("<br/>");
+                errorTxt.textContent = json.replaceAll("\r\n", "\n").replaceAll("<br/>");
+                //alert("JSON:" + json);
                 throw new Error(json);
             }
             throw new Error("HTTP " + response.status + ": " + response.statusText);
         }
 
         var ret = await response.json();
+        //alert(ret);
         return ret;
     }
     catch (e) {
         console.error(e.message);
+        return null;
         throw new Error(e.message);
     }
     finally {
@@ -83,21 +121,17 @@ async function handleClick() {
     console.log('call navigateClick');
     await app.navigateClick();
 }
-window.handleClick = handleClick; // required because script.js is included as a module in index.html (<script type="module" src="js/script.js"></script>)
-
-async function delayedRequestAnimationFrame(delay) {
-    requestAnimationFrame(resolve);
-    await new Promise(resolve => setTimeout(resolve, delay));
-}
 
 const app = 
 {
     async getAndStoreInfoInMap(alias) {
         if (!map.has(alias)) {
             var info = await ddiapi("/info/" + alias);
+            //alert(info.MinLevel);
             //console.log(JSON.stringify(info));
             map.set(alias, info);
         }
+
     },
 
     // /Secured SQL Server/DataSetReport/demo
@@ -118,6 +152,12 @@ const app =
             console.log("endpoint = "+ endpoint)
             var data = await ddiapi(endpoint);
 
+            //var info = await ddiapi("/info/" + "Secured SQL Server");
+            //alert(info);
+            //map.set(alias, info);
+
+            if (null == data)
+                return;
             lst.replaceChildren();
             for (const item of data) {
                 //data.forEach(item => {
@@ -129,7 +169,7 @@ const app =
                 var alias = matches[0];
                 await this.getAndStoreInfoInMap(alias);
 
-                var value = alias + "/" + myReplaceAll(path, ".", "/");
+                value = alias + "/" + myReplaceAll(path, ".", "/");
                 console.log("value: " + value);
 
                 li.dataset.item = value;
@@ -142,7 +182,7 @@ const app =
         }
         catch (e)
         {
-            //alert(e);
+            alert(e);
             console.error(e);
         }
         finally
@@ -156,6 +196,8 @@ const app =
             var lst = document.getElementById('lst');
             var data = await ddiapi("/aliases");
 
+            if (null == data)
+                return;
             lst.replaceChildren();
             data.forEach(item => {
                 var li = document.createElement('li');
@@ -186,55 +228,23 @@ const app =
         console.log("-----------------------------------------------------------");
     },
 
-    getEffectiveBackgroundColor(el) {
-
-        //const colorScheme = getComputedStyle(document.documentElement).colorScheme;
-        //const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        //if (colorScheme.includes('dark') || (colorScheme.includes('light dark') && prefersDark))
-        //{
-        //    alert('DARK mode');
-        //    return 'rgb(18, 18, 18)'; // approximate dark canvas default (varies)
-        //}
-        //else
-        //    alert('NOT DARK mode');
-
-        let current = el;
-        while (current) {
-            const bg = getComputedStyle(current).backgroundColor;
-
-            // Check if it's not transparent
-            const isTransparent =
-                bg === "transparent" ||
-                bg === "rgba(0, 0, 0, 0)" ||
-                /rgba\(.*,\s*0\s*\)/.test(bg); // catches any alpha of 0
-
-            if (!isTransparent) {
-                return bg;
-            }
-            current = current.parentElement;
-        }
-        return "rgb(255, 255, 255)";
-    },
-
-    swapColorAndBackground(item, oldColors) {
-        //return null;
-        if (null != oldColors) {
-            item.style.color = oldColors[0];
-            item.style.backgroundColor = oldColors[1];
-            return oldColors;
-        }
-
+    swapColorAndBackground(item, background)
+    {
         var currentColor = getComputedStyle(item).color;
-        var currentBackground = getComputedStyle(item).backgroundColor;
-        var ret = [currentColor, Color.fromString(currentBackground)];
 
-        currentBackground = this.getEffectiveBackgroundColor(item);
 
-        var tmp = Color.fromString(currentBackground);
-        currentBackground = tmp.toString(true);
+        var currentBackground;
+        if (null != background)
+            currentBackground = background.toString();
+        else {
+            currentBackground = getComputedStyle(item).backgroundColor;
+            var tmp = Color.fromString(currentBackground);
+            currentBackground = tmp.toString(true);
+            alert(currentBackground);
+        }
+        var ret = Color.fromString(currentBackground);
         item.style.color = currentBackground;
         item.style.backgroundColor = currentColor;
-        return ret;
     },
 
     async init() {
@@ -244,26 +254,19 @@ const app =
             if (!item)
                 return;
             var value = item.dataset.item;
-            var isAlias = item.isAlias;
             console.log("in listener1: value=" + value);
             var path = item.textContent.trim();
             path = myReplaceAll(path, ".", "/");
             console.log('calling tables, path:', path);
-            var oldColors;
             try {
-                oldColors = this.swapColorAndBackground(item);
-                //item.style.color = "rgb(255,0,0)"
-
-                //item.style.color = "rgb(255, 255, 255)";//currentBackground;
-                //item.style.backgroundColor = "rgb(0, 0, 0)";//currentBackground;
-
+                this.swapColorAndBackground(item);
                 await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-                await new Promise(resolve => setTimeout(resolve, 250));
 
+                alert('pause');
                 await this.tables(value);
             }
             finally {
-                oldColors = this.swapColorAndBackground(item, oldColors);
+                this.swapColorAndBackground(item);
             }
             console.log("-----------------------------------------------------------");
         });
