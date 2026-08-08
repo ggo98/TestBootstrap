@@ -1,13 +1,195 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
+
     <meta charset="UTF-8">
+
+    <style id="zaemit-motion-keyframes">
+        @keyframes zaemit-fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes zaemit-slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes zaemit-slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes zaemit-slideLeft {
+            from {
+                opacity: 0;
+                transform: translateX(40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes zaemit-slideRight {
+            from {
+                opacity: 0;
+                transform: translateX(-40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes zaemit-scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes zaemit-bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+
+            70% {
+                transform: scale(0.9);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes zaemit-fadeOut {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+            }
+        }
+
+        @keyframes zaemit-slideOutUp {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateY(-40px);
+            }
+        }
+
+        @keyframes zaemit-slideOutDown {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+        }
+
+        @keyframes zaemit-slideOutLeft {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateX(-40px);
+            }
+        }
+
+        @keyframes zaemit-slideOutRight {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateX(40px);
+            }
+        }
+
+        @keyframes zaemit-scaleOut {
+            from {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            to {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+        }
+
+        @keyframes zaemit-bounceOut {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            25% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="mainDiv" style="cursor: pointer" class="container">
-        <div>
-            <input type="text" id="path" value="/" placeholder="">
-            <button id="navigate" onclick="return handleClick();">Submit</button>
+        <div class="">
+            <input type="text" id="path" value="/" placeholder="" class="">
+            <!--<button id="navigate" onclick="return handleClick();" class="button-dwtym0" style="animation: 0.5s ease 0s 1 normal both running zaemit-fadeIn;">Submit</button>-->
+            <button id="navigate" onclick="return handleClick();" class="button-dwtym0">Submit</button>
         </div>
         <div>
             <ul id="lst">
@@ -15,8 +197,12 @@
         </div>
     </div>
     <div>
-        <pre id="errorTxt" style="color: darkred"></pre>
+        <pre id="errorTxt" style="color: darkred; white-space: pre-wrap;"></pre>
     </div>
-    <script src="js/script.js"></script>
+
+
+    <!--<script src="js/color.js"></script>-->
+    <script src="js/color.js"></script>
+    <script type="module" src="js/script.js"></script>
 </body>
 </html>

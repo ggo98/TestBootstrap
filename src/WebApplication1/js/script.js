@@ -1,4 +1,6 @@
-﻿const baseUrl = "http://localhost/dvweb_dbg/ddi";
+﻿import Color from './color.js';
+
+const baseUrl = "http://localhost/dvweb_dbg/ddi";
 
 const map = new Map();
 
@@ -42,8 +44,6 @@ async function ddiapi(endpoint) {
         //document.body.style.cursor = 'wait'; // does not work
         //document.getElementById("mainDiv").style.cursor = "wait";
         //await new Promise(resolve => setTimeout(resolve, 1500));
-        //alert("pause");
-        //alert(endpoint);
         var response = await fetch(endpoint,
         {
             method: 'GET',
@@ -61,14 +61,12 @@ async function ddiapi(endpoint) {
                 //const position = [...json].findIndex(char => char === "\n");
                 //alert(position); // 4
                 document.getElementById("errorTxt").textContent = json.replaceAll("\r\n", "\n").replaceAll("<br/>");
-                //alert("JSON:" + json);
                 throw new Error(json);
             }
             throw new Error("HTTP " + response.status + ": " + response.statusText);
         }
 
         var ret = await response.json();
-        //alert(ret);
         return ret;
     }
     catch (e) {
@@ -85,17 +83,21 @@ async function handleClick() {
     console.log('call navigateClick');
     await app.navigateClick();
 }
+window.handleClick = handleClick; // required because script.js is included as a module in index.html (<script type="module" src="js/script.js"></script>)
+
+async function delayedRequestAnimationFrame(delay) {
+    requestAnimationFrame(resolve);
+    await new Promise(resolve => setTimeout(resolve, delay));
+}
 
 const app = 
 {
     async getAndStoreInfoInMap(alias) {
         if (!map.has(alias)) {
             var info = await ddiapi("/info/" + alias);
-            //alert(info.MinLevel);
             //console.log(JSON.stringify(info));
             map.set(alias, info);
         }
-
     },
 
     // /Secured SQL Server/DataSetReport/demo
@@ -109,16 +111,12 @@ const app =
             || "" == xendpoint)
             return await this.aliases();
 
-        endpoint = "/tables/" + xendpoint;
+        var endpoint = "/tables/" + xendpoint;
         try
         {
             var lst = document.getElementById('lst');
             console.log("endpoint = "+ endpoint)
             var data = await ddiapi(endpoint);
-
-            //var info = await ddiapi("/info/" + "Secured SQL Server");
-            //alert(info);
-            //map.set(alias, info);
 
             lst.replaceChildren();
             for (const item of data) {
@@ -131,7 +129,7 @@ const app =
                 var alias = matches[0];
                 await this.getAndStoreInfoInMap(alias);
 
-                value = alias + "/" + myReplaceAll(path, ".", "/");
+                var value = alias + "/" + myReplaceAll(path, ".", "/");
                 console.log("value: " + value);
 
                 li.dataset.item = value;
@@ -144,7 +142,7 @@ const app =
         }
         catch (e)
         {
-            alert(e);
+            //alert(e);
             console.error(e);
         }
         finally
@@ -188,6 +186,57 @@ const app =
         console.log("-----------------------------------------------------------");
     },
 
+    getEffectiveBackgroundColor(el) {
+
+        //const colorScheme = getComputedStyle(document.documentElement).colorScheme;
+        //const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        //if (colorScheme.includes('dark') || (colorScheme.includes('light dark') && prefersDark))
+        //{
+        //    alert('DARK mode');
+        //    return 'rgb(18, 18, 18)'; // approximate dark canvas default (varies)
+        //}
+        //else
+        //    alert('NOT DARK mode');
+
+        let current = el;
+        while (current) {
+            const bg = getComputedStyle(current).backgroundColor;
+
+            // Check if it's not transparent
+            const isTransparent =
+                bg === "transparent" ||
+                bg === "rgba(0, 0, 0, 0)" ||
+                /rgba\(.*,\s*0\s*\)/.test(bg); // catches any alpha of 0
+
+            if (!isTransparent) {
+                return bg;
+            }
+            current = current.parentElement;
+        }
+        return "rgb(255, 255, 255)";
+    },
+
+    swapColorAndBackground(item, oldColors) {
+        //return null;
+        if (null != oldColors) {
+            item.style.color = oldColors[0];
+            item.style.backgroundColor = oldColors[1];
+            return oldColors;
+        }
+
+        var currentColor = getComputedStyle(item).color;
+        var currentBackground = getComputedStyle(item).backgroundColor;
+        var ret = [currentColor, Color.fromString(currentBackground)];
+
+        currentBackground = this.getEffectiveBackgroundColor(item);
+
+        var tmp = Color.fromString(currentBackground);
+        currentBackground = tmp.toString(true);
+        item.style.color = currentBackground;
+        item.style.backgroundColor = currentColor;
+        return ret;
+    },
+
     async init() {
         var lst = document.getElementById('lst');
         lst.addEventListener('click', async (event) => {
@@ -200,7 +249,22 @@ const app =
             var path = item.textContent.trim();
             path = myReplaceAll(path, ".", "/");
             console.log('calling tables, path:', path);
-            await this.tables(value);
+            var oldColors;
+            try {
+                oldColors = this.swapColorAndBackground(item);
+                //item.style.color = "rgb(255,0,0)"
+
+                //item.style.color = "rgb(255, 255, 255)";//currentBackground;
+                //item.style.backgroundColor = "rgb(0, 0, 0)";//currentBackground;
+
+                await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+                await new Promise(resolve => setTimeout(resolve, 250));
+
+                await this.tables(value);
+            }
+            finally {
+                oldColors = this.swapColorAndBackground(item, oldColors);
+            }
             console.log("-----------------------------------------------------------");
         });
 

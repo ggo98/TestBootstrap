@@ -69,6 +69,7 @@
   <ItemGroup>
     <Content Include="Global.asax" />
     <Content Include="index.html" />
+    <Content Include="js\color.js" />
     <Content Include="js\script.js" />
     <Content Include="Web.config" />
   </ItemGroup>
@@ -109,7 +110,6 @@
           <DevelopmentServerPort>57481</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:57481/</IISUrl>
-          <!-- <IISUrl>https://localhost:44315/</IISUrl> -->
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
